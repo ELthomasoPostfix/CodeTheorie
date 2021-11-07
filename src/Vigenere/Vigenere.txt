@@ -1,0 +1,2 @@
+Given a keyword "APPLECAKE", we will work with range the keyword is mapped to, 0-8, instead of the keyword itself.
+This means that instead of working with 26! + 25! + ... possibilities, we have 8! possibilities.

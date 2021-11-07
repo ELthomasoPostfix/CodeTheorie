@@ -1,7 +1,9 @@
 """
-kt = kolom transpositie
+This file decrypts a message encrypted using first the vigenere technique and then
+a single column transposition.
+
+ct = kolom transpositie
 v = vigenere
 m = message
-(  kt(v(m))  )⁻¹  =  (kt ° v)⁻¹(m) = (v⁻¹ ° kt⁻¹)(m) = v⁻¹(kt⁻¹(m))
+(  ct(v(m))  )⁻¹  =  (ct ° v)⁻¹(m) = (v⁻¹ ° ct⁻¹)(m) = v⁻¹(ct⁻¹(m))
 """
-

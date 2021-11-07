@@ -1,8 +1,8 @@
-
-def print_hi(name):
-    print(f'Hi, {name}')
+from src.Vigenere.Vigenere import vigenere
 
 
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    msg = "Hello World!"
+    key = "body"
+    vigenere(msg, key)
 

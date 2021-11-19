@@ -1,38 +1,32 @@
 """
-This file implements the vigenere and column transposition encryption techniques.
+This file implements the vigenere encryption technique.
 """
 
 
-def vigenere(msg: str, key: str) -> str:
-    transformedMsg: str = ""
+def sumChars(a: chr, b: chr):
+    return chr(((ord(a) + ord(b)) % 26) + 65)
 
 
+def diffChars(a: chr, b: chr):
+    return chr(((ord(a) - ord(b)) % 26) + 65)
 
-    return transformedMsg
+
+def vigenereAlg(text: str, key: str, function):
+    res: str = ""
+    keyLen: int = len(key)
+    key = key.upper()
 
 
-def columnTransposition(msg: str, key: str) -> str:
-    transposed = ""
+    for i, c in enumerate(text):
+        res += function(c, key[i % keyLen])
 
-    msg = msg.lower()
-    key = key.lower()
-    s = sorted(key)
-    m: dict = {c: v for c, v in enumerate(s)}
-    columns = [(-1, -1)] * len(key)   # (sorted key index, unsorted key index)
+    return res
 
-    for pair in m.items():
-        for index in range(len(key)):
-            if key[index] == pair[1] and columns[index][0] == -1:
-                columns[index] = (pair[0], index)
-                break
 
-    # sort the columns based on assigned numerical value (sort a-z)
-    columns = sorted(columns, key=lambda pair: pair[0])
+def vigenere(plainText: str, key: str) -> str:
+    return vigenereAlg(plainText, key, sumChars)
 
-    for col in columns:
-        msgInd = col[1]
-        while msgInd < len(msg):
-            transposed += msg[msgInd]
-            msgInd += len(key)
 
-    return transposed
+def invertedVigenere(cipherText: str, key: str) -> str:
+    return vigenereAlg(cipherText, key, diffChars)
+

@@ -182,3 +182,33 @@ def latinAlphabet(uppercase: bool = False):
     a: int = 0x61 - 0x20 * uppercase
     return [chr(asciiVal) for asciiVal in range(a, a + 26)]
 
+
+"""
+    Each character in the latin alphabet is assigned a value of O-25.
+    To sum two characters, do 
+        ( val(a) + val(b) ) % 26
+    where the value wraps around as to stay in the 0-25 range.
+    Keeps case of a.
+"""
+def sumChars(a: chr, b: chr):
+    lower = ord(a) >= 0x61
+    a = a.upper()
+    b = b.upper()
+    c = chr(((ord(a) + ord(b)) % 26) + 0x41)
+    return c.lower() if lower else c.upper()
+
+
+"""
+    Each character in the latin alphabet is assigned a value of O-25.
+    To subtract two characters, do 
+        ( val(a) - val(b) ) % 26
+    where the value wraps around as to stay in the 0-25 range.
+    Keeps case of a.
+"""
+def diffChars(a: chr, b: chr):
+    lower = ord(a) >= 0x61
+    a = a.upper()
+    b = b.upper()
+    c = chr(((ord(a) - ord(b)) % 26) + 0x41)
+    return c.lower() if lower else c.upper()
+

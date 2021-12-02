@@ -9,12 +9,9 @@ m = message
 
 """
 
-from src.Vigenere.Vigenere import vigenere
-
-
-
 from itertools import *
-from src.Utils.Utils import invertedColumnTransposition
+from src.Utils.Utils import invertedColumnTransposition, sumChars
+from src.Vigenere.Vigenere import vigenere
 
 
 def vigenerePlus(cipherText: str):

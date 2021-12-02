@@ -212,3 +212,107 @@ def diffChars(a: chr, b: chr):
     c = chr(((ord(a) - ord(b)) % 26) + 0x41)
     return c.lower() if lower else c.upper()
 
+
+"""
+    A class that simulates a key in string form that contains only lower case
+    OR upper case latin letters, not a combination of both.
+    A key is generated from a seed. The seed is a value from
+    0 to (26^keyLen)-1, where seed 0 corresponds to key 'AA ... AA'
+    and seed (26^keyLen)-1 corresponds to 'ZZ ... ZZ'. The least significant
+    character is at index 0 of the key.
+    It provides incrementation and decrementation of the key.
+"""
+class KeyB26:
+    def __init__(self, keyLen: int, seed: int, upper: bool = True):
+        self.isUpper = upper
+        self.key = self.generateKey(seed, keyLen)
+        self.key = self.key.upper() if upper else self.key.lower()
+
+    def __index__(self, index):
+        if index >= self.__len__():
+            return ""
+        return self.key[index]
+
+    def __len__(self):
+        return len(self.key)
+
+    """
+        Acts as if the seed has just been incremented.
+        Returns overflow boolean.
+    """
+    def incr(self):
+        key = list(self.key)
+        index: int = 0
+
+        # find index to lend to and redistribute lent value
+        while index < len(key) and key[index] == self.max():
+            key[index] = sumChars(key[index], self.one())
+            index += 1
+
+        # lend value
+        if index < len(self.key):
+            key[index] = sumChars(key[index], self.one())
+
+        self.key = ''.join(key)
+        return index == len(self.key)
+
+    """
+        Acts as if the seed has just been decremented.
+        Returns underflow boolean.
+    """
+    def decr(self):
+        underflow: bool = False
+        key = list(self.key)
+        index: int = 0
+
+        # find index to borrow from
+        while index < len(key) and key[index] == self.zero():
+            index += 1
+
+        # handle underflow
+        if index >= len(self.key):
+            index -= 1
+            underflow = True
+
+        # redistribute borrowed value
+        while index >= 0:
+            key[index] = diffChars(key[index], self.one())
+            index -= 1
+
+        self.key = ''.join(key)
+        return underflow
+
+    def isalpha(self):
+        return self.key.isalpha()
+
+    def isCapital(self):
+        return self.isUpper
+
+    def generateKey(self, seed: int, keyLen: int):
+        key = [''] * keyLen
+        for index in range(keyLen - 1, -1, -1):
+            charValue = seed // pow(26, index)
+            if charValue > 25:
+                continue
+            key[index] = chr(charValue + 0x41)
+            seed -= charValue * pow(26, index)
+
+        return ''.join(key)
+
+    def seed(self):
+        seed: int = 0
+        for i, c in enumerate(self.key):
+            seed += (ord(c) % 0x41) * pow(26, i)
+        return seed
+
+    def one(self):
+        return 'B'
+
+    def max(self):
+        return 'Z'
+
+    def zero(self):
+        return 'A'
+
+
+

@@ -230,6 +230,7 @@ class KeyN10:
     def __init__(self, keyLen: int, seed: int):
         keyLen = keyLen if keyLen > 0 else 1
         keyLen = keyLen if keyLen <= 10 else 10
+        seed %= factorial(keyLen)
         self.__symbols = [str(num) for num in range(keyLen)]
 
         self.__key, self.__indices = self.__generateKey(seed, keyLen)

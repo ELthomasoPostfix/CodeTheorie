@@ -21,6 +21,6 @@ def vigenere(plainText: str, key: str) -> str:
     return vigenereAlg(plainText, key, sumChars)
 
 
-def vigenereInverted(cipherText: str, key: str) -> str:
+def invertedVigenere(cipherText: str, key: str) -> str:
     return vigenereAlg(cipherText, key, diffChars)
 

@@ -117,11 +117,11 @@ def kasiski(cipherText: str, widths: [int], maxKeyLen: int, minOccurrences: int 
     return occurrences
 
 
-def ic(i, alphabet: [chr]):
-    if isinstance(i, type([str])):
-        return icf(i, alphabet)
-    elif isinstance(i, str):
-        return ics(i, alphabet)
+def ic(textSource, alphabet: [chr]):
+    if isinstance(textSource, type([str])):
+        return icf(textSource, alphabet)
+    elif isinstance(textSource, str):
+        return ics(textSource, alphabet)
     else:
         return 0.0
 
@@ -230,16 +230,16 @@ class KeyN10:
     def __init__(self, keyLen: int, seed: int):
         keyLen = max(0, min(keyLen, 10))        # clamp 0 <= keyLen <= 10
         seed %= factorial(keyLen)
-        self.__symbols = [str(num) for num in range(keyLen)]
+        self.__symbols = [num for num in range(keyLen)]
 
         self.__key, self.__indices = self.__generateKey(seed, keyLen)
 
-        self.__cache = ""
+        self.__cache = None
         self.__cacheIsValid = False
 
     def __index__(self, index):
         if index >= self.__len__():
-            return ""
+            return None
         return self.__key[index]
 
     def __len__(self):
@@ -255,7 +255,7 @@ class KeyN10:
                 the front instead of front to end.
         Returns overflow boolean.
     """
-    def incr(self, index: int = 1):
+    def incr(self, index: int = -1):
         self.__cacheIsValid = False
 
         # backtrack
@@ -297,7 +297,7 @@ class KeyN10:
                 the front instead of front to end.
         Returns underflow boolean.
     """
-    def decr(self, index: int = 1):
+    def decr(self, index: int = -1):
         self.__cacheIsValid = False
 
         # backtrack
@@ -336,7 +336,7 @@ class KeyN10:
         return self.__cache
 
     """
-        Return the key in char list form.
+        Return the key in list form.
     """
     def keyList(self):
         return self.__key
@@ -356,7 +356,8 @@ class KeyN10:
 
     def __updateCache(self):
         if not self.__cacheIsValid:
-            self.__cache = ''.join(self.__key)
+            temp = [str(elem) for elem in self.__key]
+            self.__cache = ''.join(temp)
             self.__cacheIsValid = True
 
     def __generateKey(self, seed: int, keyLen: int):

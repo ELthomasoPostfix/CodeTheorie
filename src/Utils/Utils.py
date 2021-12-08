@@ -228,14 +228,11 @@ def diffChars(a: chr, b: chr):
 """
 class KeyN10:
     def __init__(self, keyLen: int, seed: int):
-        keyLen = keyLen if keyLen > 0 else 1
-        keyLen = keyLen if keyLen <= 10 else 10
+        keyLen = max(0, min(keyLen, 10))        # clamp 0 <= keyLen <= 10
         seed %= factorial(keyLen)
         self.__symbols = [str(num) for num in range(keyLen)]
 
         self.__key, self.__indices = self.__generateKey(seed, keyLen)
-        self.__seed = seed
-        self.__maxSeed = factorial(self.__len__()) - 1
 
         self.__cache = ""
         self.__cacheIsValid = False
@@ -249,17 +246,24 @@ class KeyN10:
         return len(self.__key)
 
     """
-        Acts as if the seed has just been incremented.
+        Acts as if index :i: of the seed has just been decremented. As the key may not contain any
+        duplicate characters and contains only characters in the range {0, 1, ..., keyLen}, all characters
+        from and including the specified index :i: cannot bet guaranteed to remain the same. Overflow of
+        the incremented index may still alter characters at an index less than :i: through a carry value.
+        :param i: The index to increment. Enforces i < len(key) - 1; the seed must be incremented by
+                at least one. Indexation treats negative i values as indexing from the end to
+                the front instead of front to end.
         Returns overflow boolean.
     """
-    def incr(self):
+    def incr(self, index: int = 1):
         self.__cacheIsValid = False
 
         # backtrack
-        index = self.__len__()
-        backtrackList = []
-        prevBranch = -1      # init value
-        prevMaxBranch = -1   # init value
+        index %= self.__len__()
+        backtrackList = self.__key[index:]
+        prevBranch = self.__indices[index]
+        prevMaxBranch = self.__len__() - index - 1
+
         while index > 0 and prevBranch == prevMaxBranch:
             index -= 1
             backtrackList.append(self.__key[index])
@@ -267,7 +271,7 @@ class KeyN10:
             prevBranch = self.__indices[index]
             prevMaxBranch += 1
 
-
+        overflow = prevBranch == prevMaxBranch and len(backtrackList) == self.__len__()
         backtrackList.sort()
 
         branch = prevBranch + 1 if prevBranch < prevMaxBranch else 0
@@ -280,30 +284,35 @@ class KeyN10:
             self.__indices[i] = 0
             self.__key[i] = backtrackList.pop(0)
 
-        self.__seed = self.__seed + 1 if self.__seed < self.__maxSeed else 0
 
-        return self.__seed == 0
+        return overflow
 
     """
-        Acts as if the seed has just been decremented.
+        Acts as if index :i: of the seed has just been incremented. As the key may not contain any
+        duplicate characters and contains only characters in the range {0, 1, ..., keyLen}, all characters
+        from and including the specified index :i: cannot bet guaranteed to remain the same. Underflow of
+        the decremented index may still alter characters at an index less than :i: through value borrowing.
+        :param i: The index to decrement. Enforces i < len(key) - 1; the seed must be decremented by
+                at least one. Indexation treats negative i values as indexing from the end to
+                the front instead of front to end.
         Returns underflow boolean.
     """
-    def decr(self):
-        overflow = self.__seed == 0
+    def decr(self, index: int = 1):
         self.__cacheIsValid = False
 
         # backtrack
-        index = self.__len__()
-        backtrackList = []
-        prevBranch = 0      # init value
-        MIN_BRANCH = 0   # init value
+        index %= self.__len__()
+        backtrackList = self.__key[index:]
+        prevBranch = self.__indices[index]
+        MIN_BRANCH = 0   # constant
+
         while index > 0 and prevBranch == MIN_BRANCH:
             index -= 1
             backtrackList.append(self.__key[index])
 
             prevBranch = self.__indices[index]
 
-
+        underflow = prevBranch == MIN_BRANCH and len(backtrackList) == self.__len__()
         backtrackList.sort()
 
         branch = prevBranch - 1 if prevBranch > MIN_BRANCH else len(backtrackList) - 1
@@ -317,25 +326,33 @@ class KeyN10:
             self.__indices[i] = back
             self.__key[i] = backtrackList.pop(back)
 
-        self.__seed = self.__seed - 1 if self.__seed > 0 else self.__maxSeed
-
-        return overflow
+        return underflow
 
     """
-        Return key in string form.
+        Return the key in string form.
     """
     def key(self):
         self.__updateCache()
         return self.__cache
 
     """
-        Return key in char list form.
+        Return the key in char list form.
     """
     def keyList(self):
         return self.__key
 
+    """
+        Return seed of the current key.
+    """
     def seed(self):
-        return self.__seed
+        seed = 0
+        nrChoices = self.__len__()
+
+        for index in self.__indices:
+            seed += index * factorial(nrChoices - 1)
+            nrChoices -= 1
+
+        return seed
 
     def __updateCache(self):
         if not self.__cacheIsValid:
@@ -352,8 +369,7 @@ class KeyN10:
             index = floor(factor)
             seed -= index * nrLeaves              # choosing subtree index (0 -> nrChoices) trims index*nrLeaves leaves
 
-            res = symbols[index]
-            symbols.remove(res)
+            res = symbols.pop(index)
             key.append(res)
 
             indices.append(index)
@@ -394,23 +410,22 @@ class KeyB26:
         return len(self.__key)
 
     """
-        Acts as if the seed has just been incremented.
-        :param i : The index to increment. The seed will be increased by 26^i. Indexation
+        Acts as if index i of the seed has just been incremented.
+        :param i: The index to increment. The seed will be increased by 26^i. Indexation
                 treats negative i values as indexing from the end to the front instead of front to end.
         Returns overflow boolean.
     """
-    def incr(self, i: int = 0):
+    def incr(self, index: int = 0):
         self.__cacheIsValid = False
         key = self.__key
-        i = i % len(key)
-        index: int = i
+        index %= len(key)
 
-        # Find the index to lend to and redistribute the lent value
+        # Push carry value up
         while index < len(key) and key[index] == self.max():
             key[index] = sumChars(key[index], self.one())
             index += 1
 
-        # Lend a value
+        # Lend a value (final carry assignment)
         if index < len(key):
             key[index] = sumChars(key[index], self.one())
 
@@ -418,7 +433,7 @@ class KeyB26:
 
     """
         Acts as if the seed has just been decremented.
-        :param i : The index to decrement. The seed will be lowered by 26^i. Indexation
+        :param i: The index to decrement. The seed will be lowered by 26^i. Indexation
                 treats negative i values as indexing from the end to the front instead of front to end.
         Returns underflow boolean.
     """
@@ -426,7 +441,7 @@ class KeyB26:
         self.__cacheIsValid = False
         underflow: bool = False
         key = self.__key
-        i = i % len(key)
+        i %= len(key)
         index: int = i
 
         # find index to borrow from
@@ -445,6 +460,9 @@ class KeyB26:
 
         return underflow
 
+    """
+        Return the key in string form.
+    """
     def key(self):
         self.__updateCache()
         return self.__cache
@@ -456,6 +474,9 @@ class KeyB26:
     def iscapital(self):
         return self.isUpper
 
+    """
+        Return seed of the current key.
+    """
     def seed(self):
         seed: int = 0
         self.__updateCache()

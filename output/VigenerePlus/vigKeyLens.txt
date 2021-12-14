@@ -1,0 +1,5 @@
+maxColAvg: period   = 7 | avg = 0.055514161129847986 | ctKeyLen = 8
+maxMulAvg: multiple = 7 | avg = 0.055514161129847986 | ctKeyLen = 8
+
+===========================================
+

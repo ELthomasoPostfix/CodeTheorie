@@ -1,4 +1,4 @@
-from src.Utils.Utils import toLatin
+from src.Utils.TextManipulation import toLatin
 from math import log10
 
 

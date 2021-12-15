@@ -8,14 +8,10 @@ m = message
 (  ct(v(m))  )⁻¹  =  (ct ° v)⁻¹(m) = (v⁻¹ ° ct⁻¹)(m) = v⁻¹(ct⁻¹(m))
 
 """
-import time
 from itertools import permutations
 
-from typing import List
-
-from src.Utils.Keys.KeyB26 import KeyB26
 from src.Utils.Keys.KeyN10 import KeyN10
-from src.Utils.LatinNGrams import LatinNGrams
+from src.Utils.TextManipulation import latinAlphabet
 from src.Utils.Utils import *
 from src.Utils.Statistics.statistics import *
 from src.Vigenere.TextFrames.VigenerePlusTextFrame import VigenerePlusTextFrame
@@ -247,7 +243,7 @@ def vigenerePlusDecryption(cipherText: str, ctTextLimit: int = -1):
     ==> keyLen == 7 or keyLen in [2, 4, 8] ??? 
     """
 
-    #avgICs(cipherText)
+    avgICs(cipherText)
 
 
     """

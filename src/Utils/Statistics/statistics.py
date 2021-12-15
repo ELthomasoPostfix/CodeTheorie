@@ -12,7 +12,7 @@
 import collections
 import time
 import unicodedata
-from src.Utils.Utils import toLatin
+from src.Utils.TextManipulation import toLatin
 
 
 def kasiski(cipherText: str, widths: [int], maxKeyLen: int, minOccurrences: int = 2, includeOne: bool = False):
@@ -56,11 +56,11 @@ def kasiski(cipherText: str, widths: [int], maxKeyLen: int, minOccurrences: int 
     return occurrences
 
 
-def ic(textSource, alphabet: [chr]):
+def ic(textSource, alphabet: [chr], countSeparatedBigrams: bool = False):
     if isinstance(textSource, type([str])):
         return icf(textSource, alphabet)
     elif isinstance(textSource, str):
-        return ics(textSource, alphabet)
+        return ics(textSource, alphabet, countSeparatedBigrams)
     else:
         return 0.0
 
@@ -94,7 +94,7 @@ def icf(filenames: [str], alphabet: [chr]) -> float:
     return icVal / (total * (total - 1))
 
 
-def ics(text: str, alphabet: [chr]) -> float:
+def ics(text: str, alphabet: [chr], countSeparatedBigrams: bool = False) -> float:
     charCounts = {char.upper(): 0 for char in alphabet}
 
     if len(charCounts) == 0:
@@ -102,11 +102,14 @@ def ics(text: str, alphabet: [chr]) -> float:
 
     text = ''.join(c for c in unicodedata.normalize('NFD', text)
                    if c.isalpha() and unicodedata.category(c) != 'Mn')
-    text = text.upper()
+    countable = text.upper()
+
+    if countSeparatedBigrams:
+        countable = [countable[i] + countable[i+1] for i in range(0, len(countable) - 1, 2)]
 
     # calc character counts
-    for char, count in collections.Counter(text).items():
-        charCounts[char] = count
+    for key, count in collections.Counter(countable).items():
+        charCounts[key] = count
 
 
     # calc ic value

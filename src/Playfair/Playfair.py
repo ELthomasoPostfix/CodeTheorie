@@ -2,7 +2,7 @@ from collections import OrderedDict
 from typing import List
 
 from src.Playfair.Substitution import Substitution
-from src.Utils.Utils import latinAlphabet, toLatin
+from src.Utils.TextManipulation import toLatin, latinAlphabet
 
 
 def playfair(plaintext: str, keyWord: str):

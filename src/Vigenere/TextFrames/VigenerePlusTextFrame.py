@@ -1,5 +1,6 @@
 from collections import Callable
 
+from src.Utils.TextManipulation import latinAlphabet
 from src.Utils.Utils import *
 from src.Utils.Statistics.statistics import *
 from src.Utils.TextFrame import TextFrame

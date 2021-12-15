@@ -1,13 +1,7 @@
-import copy
-import queue
 import random
 from io import TextIOWrapper
-from math import ceil, floor, factorial, log
-import unicodedata
+from math import ceil
 from typing import List
-
-from unidecode import unidecode
-
 from src.Utils.LatinNGrams import LatinNGrams
 
 
@@ -72,19 +66,6 @@ def invertedColumnTransposition(cipherText: str, key) -> str:
             invColTrans += cipherText[msgInd]
 
     return invColTrans
-
-
-def isChrLatin(c: str):
-    return c.isalpha() and unicodedata.category(c) != 'Mn'
-
-
-def toLatin(text: str):
-    return ''.join(unidecode(c) for c in unicodedata.normalize('NFKD', text) if isChrLatin(c))
-
-
-def latinAlphabet(uppercase: bool = False):
-    a: int = 0x61 - 0x20 * uppercase
-    return [chr(asciiVal) for asciiVal in range(a, a + 26)]
 
 
 """

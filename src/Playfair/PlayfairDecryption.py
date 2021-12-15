@@ -8,8 +8,9 @@ from src.Playfair.Playfair import invertedPlayfair
 from src.Playfair.Substitution import Substitution
 from src.Playfair.TextFrames.PlayfairManualTextFrame import PlayfairManualTextFrame
 from src.Utils.LatinNGrams import LatinNGrams
-from src.Utils.Utils import latinAlphabet, swap2rows, copyList, swap2cols, exchange2letters, \
+from src.Utils.Utils import swap2rows, copyList, swap2cols, exchange2letters, \
     generateMonoFiles, generateBiFiles
+from src.Utils.TextManipulation import latinAlphabet
 
 
 def generateFiles(cipherText: str):
@@ -199,7 +200,7 @@ def playfairDecryption(cipherText: str):
             print(f"Best key so far   : {''.join(key)}")
 
             # write to file
-            of = open(f"{ofPath}/playfair_3_{batchCtr}.txt", 'w')
+            of = open(f"{ofPath}/playfair_redundant_{batchCtr}.txt", 'w')
             of.write(str(score) + "\n")
             of.write(''.join(bestKey) + "\n")
             of.write(bestText)

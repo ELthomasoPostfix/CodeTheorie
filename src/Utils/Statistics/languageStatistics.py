@@ -1,5 +1,5 @@
 from src.Utils.Statistics.statistics import ic
-from src.Utils.Utils import toLatin
+from src.Utils.TextManipulation import toLatin
 
 
 def icDutch():

@@ -2,7 +2,7 @@ from itertools import permutations
 
 from src.Playfair.Substitution import Substitution
 from src.Utils.TextFrame import TextFrame
-from src.Utils.Utils import latinAlphabet
+from src.Utils.TextManipulation import latinAlphabet
 
 
 class PlayfairTextFrame(TextFrame):

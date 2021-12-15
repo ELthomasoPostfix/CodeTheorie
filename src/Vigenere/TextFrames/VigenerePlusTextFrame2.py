@@ -1,4 +1,4 @@
-from src.Utils.LatinNGrams import LatinNGrams
+from src.Utils.TextManipulation import latinAlphabet
 from src.Utils.Utils import *
 from src.Utils.TextFrame import TextFrame
 

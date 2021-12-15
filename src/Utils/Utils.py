@@ -8,6 +8,7 @@ from typing import List
 
 from unidecode import unidecode
 
+from src.Utils.LatinNGrams import LatinNGrams
 
 
 def keyCharOrdering(key: str) -> [int]:
@@ -178,3 +179,46 @@ def copyList(lst: List[str], toCopy: List[str], reverse=False):
         for i in range(len(lst)):
             lst[i] = toCopy[i]
 
+
+def generateMonoFiles(cipherText: str, countFreq: str,
+                      storedPath:str, measuredPath: str, combinedPath: str):
+
+    monoCounts = {}
+    for c in cipherText:
+        monoCounts.setdefault(c, 0)
+        monoCounts[c] += 1
+    writePairList(list(monoCounts.items()), measuredPath, True, True)
+
+    storedMono = LatinNGrams(iPath=storedPath, statType=countFreq, toLogFreq=False).getFrequenciesList()
+    measuredMono = LatinNGrams(iPath=measuredPath, statType=countFreq, toLogFreq=False).getFrequenciesList()
+
+
+    of = open(combinedPath, 'w')
+    of.write("stored mono freq\n")
+    writePairList(storedMono, of)
+    of.write("\n\n")
+    of.write("measured mono freq\n")
+    writePairList(measuredMono, of)
+    of.close()
+
+
+def generateBiFiles(cipherText: str, countFreq: str,
+                    storedPath: str, measuredPath: str, combinedPath: str):
+
+    biCounts = {}
+    for index in range(len(cipherText)-1):
+        bigram = cipherText[index] + cipherText[index+1]
+        biCounts.setdefault(bigram, 0)
+        biCounts[bigram] += 1
+    writePairList(list(biCounts.items()), measuredPath, True, True)
+
+    storedMono = LatinNGrams(iPath=storedPath, statType=countFreq, toLogFreq=False).getFrequenciesList()
+    measuredMono = LatinNGrams(iPath=measuredPath, statType=countFreq, toLogFreq=False).getFrequenciesList()
+
+    of = open(combinedPath, 'w')
+    of.write("stored bi freq\n")
+    writePairList(storedMono, of)
+    of.write("\n\n")
+    of.write("measured bi freq\n")
+    writePairList(measuredMono, of)
+    of.close()

@@ -81,7 +81,6 @@ def avgICs(cipherText: str):
     """
 
 
-    vgPlusFrame = VigenerePlusTextFrame(cipherText, rowWidth=0)
     output = ""     # TODO  output
 
     maxColAvg = 0

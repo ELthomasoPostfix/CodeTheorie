@@ -8,51 +8,8 @@ from src.Playfair.Playfair import invertedPlayfair
 from src.Playfair.Substitution import Substitution
 from src.Playfair.TextFrames.PlayfairManualTextFrame import PlayfairManualTextFrame
 from src.Utils.LatinNGrams import LatinNGrams
-from src.Utils.Utils import writePairList, latinAlphabet, swap2rows, copyList, swap2cols, exchange2letters
-
-
-def generateMonoFiles(cipherText: str, countFreq: str,
-                      storedPath:str, measuredPath: str, combinedPath: str):
-
-    monoCounts = {}
-    for c in cipherText:
-        monoCounts.setdefault(c, 0)
-        monoCounts[c] += 1
-    writePairList(list(monoCounts.items()), measuredPath, True, True)
-
-    storedMono = LatinNGrams(iPath=storedPath, statType=countFreq, toLogFreq=False).getFrequenciesList()
-    measuredMono = LatinNGrams(iPath=measuredPath, statType=countFreq, toLogFreq=False).getFrequenciesList()
-
-
-    of = open(combinedPath, 'w')
-    of.write("stored mono freq\n")
-    writePairList(storedMono, of)
-    of.write("\n\n")
-    of.write("measured mono freq\n")
-    writePairList(measuredMono, of)
-    of.close()
-
-
-def generateBiFiles(cipherText: str, countFreq: str,
-                    storedPath:str, measuredPath: str, combinedPath: str):
-
-    biCounts = {}
-    for index in range(len(cipherText)-1):
-        bigram = cipherText[index] + cipherText[index+1]
-        biCounts.setdefault(bigram, 0)
-        biCounts[bigram] += 1
-    writePairList(list(biCounts.items()), measuredPath, True, True)
-
-    storedMono = LatinNGrams(iPath=storedPath, statType=countFreq, toLogFreq=False).getFrequenciesList()
-    measuredMono = LatinNGrams(iPath=measuredPath, statType=countFreq, toLogFreq=False).getFrequenciesList()
-
-    of = open(combinedPath, 'w')
-    of.write("stored bi freq\n")
-    writePairList(storedMono, of)
-    of.write("\n\n")
-    of.write("measured bi freq\n")
-    writePairList(measuredMono, of)
-    of.close()
+from src.Utils.Utils import latinAlphabet, swap2rows, copyList, swap2cols, exchange2letters, \
+    generateMonoFiles, generateBiFiles
 
 
 def generateFiles(cipherText: str):

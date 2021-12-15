@@ -7,11 +7,11 @@ from math import log10
     Heavy inspiration from http://practicalcryptography.com/ and their ngram_score.py module
 """
 class LatinNGrams:
-    def __init__(self, ifileName: str, statType: str, delimiter=" "):
+    def __init__(self, iPath: str, statType: str, delimiter=" ", toLogFreq=True):
         """
         Calculate and keep track of the logFrequencies of ngrams.
         Ignore case.
-        :param ifileName: The file containing the frequency statistics.
+        :param iPath: The file containing the frequency statistics.
                 The file must exclusively contain ngrams of the same length.
                 The file must contain rows of the following format:
                 the ngram followed by a delimiter followed by the frequency statistic.
@@ -27,12 +27,14 @@ class LatinNGrams:
         if statType != 'CF' and statType != 'PF':
             raise ValueError("Incorrect input statistic type")
 
+        self.__isLogFreq = toLogFreq
+
         self.floor = -4
         self.__count = -1
         self.ngramSize = 0
         self.__logFrequencies = {}
 
-        fi = open(ifileName, 'r')
+        fi = open(iPath, 'r')
 
         # Sum frequency
         first = True
@@ -50,15 +52,16 @@ class LatinNGrams:
         fi.close()
 
         # Transform count into frequency
-        if statType == 'CF':
+        if statType == 'CF' and len(self.__logFrequencies) > 0:
             self.__count = sum(self.__logFrequencies.values())
             self.floor = log10(0.01 / self.__count)
             for key in self.__logFrequencies.keys():
                 self.__logFrequencies[key] /= self.__count
 
-        # Transform frequency into logFrequency
-        for key in self.__logFrequencies.keys():
-            self.__logFrequencies[key] = log10(self.__logFrequencies[key])
+        if toLogFreq:
+            self.__toLogFreq()
+
+
 
     def __contains__(self, ngram: str):
         return ngram in self.__logFrequencies
@@ -75,13 +78,25 @@ class LatinNGrams:
         then 0 is returned. Else -3 (equivalent to a frequency of 0.1%)
         is returned.
         """
+        if not self.__isLogFreq:
+            self.__toLogFreq()
         ngram = ngram.upper()
         return self.__logFrequencies.get(ngram, (len(ngram) != self.ngramSize) * self.floor)
 
     def score(self, text: str):
+        if not self.__isLogFreq:
+            self.__toLogFreq()
         score = 0
         for i in range(len(text) - self.ngramSize + 1):
             ngram = text[i:i+self.ngramSize]
             score += self.frequency(ngram)
         return score
 
+    def getFrequenciesList(self):
+        return list(self.__logFrequencies.items())
+
+
+    def __toLogFreq(self):
+        # Transform frequency into logFrequency
+        for key in self.__logFrequencies.keys():
+            self.__logFrequencies[key] = log10(self.__logFrequencies[key])

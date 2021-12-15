@@ -226,7 +226,7 @@ def writeResults(results, postfixCounter: int):
     print("past")
 
 
-def vigenerePlus(cipherText: str, ctTextLimit: int = -1):
+def vigenerePlusDecryption(cipherText: str, ctTextLimit: int = -1):
 
 
     """
@@ -292,8 +292,8 @@ def vigenerePlus(cipherText: str, ctTextLimit: int = -1):
     germanTrigrams = f"{NGRAMPATH}/{PCPATH}/german_trigrams.txt"
     germanQuadgrams = f"{NGRAMPATH}/{PCPATH}/german_quadgrams.txt"
 
-    trigramsE: LatinNGrams = LatinNGrams(ifileName=germanTrigrams, statType=countFrequency)
-    quadgramsE: LatinNGrams = LatinNGrams(ifileName=germanQuadgrams, statType=countFrequency)
+    trigramsE: LatinNGrams = LatinNGrams(iPath=germanTrigrams, statType=countFrequency)
+    quadgramsE: LatinNGrams = LatinNGrams(iPath=germanQuadgrams, statType=countFrequency)
 
 
     starterWidth = 3

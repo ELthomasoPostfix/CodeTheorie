@@ -1,22 +1,25 @@
 from collections import OrderedDict
+from typing import List
+
+from src.Playfair.Substitution import Substitution
 from src.Utils.Utils import latinAlphabet, toLatin
 
 
-def playfair(plaintext: str, key: str):
-    replaceable: str = 'J'.upper()
-    substitute: str = 'I'.upper()
-    filler: str = 'X'.upper()
+def playfair(plaintext: str, keyWord: str):
+    replaceable: str = Substitution.REPLACEABLE.upper()
+    substitute: str = Substitution.SUBSTITUTE.upper()
+    filler: str = Substitution.FILLER.upper()
 
     la = latinAlphabet(True)
     la.remove(replaceable)
 
     plaintext = toLatin(plaintext).upper().replace(replaceable, substitute)
 
-    key = toLatin(key).upper().replace(replaceable, substitute)
-    keyWord = ''.join(OrderedDict.fromkeys(key)) +\
-          ''.join(sorted(list(set(la) - set(key))))
+    keyWord = toLatin(keyWord).upper().replace(replaceable, substitute)
+    key = ''.join(OrderedDict.fromkeys(keyWord)) +\
+              ''.join(sorted(list(set(la) - set(keyWord))))
 
-    digramText = ""
+    ciphertext = ""
     c1: str = ''
     c2: str = ''
     i: int = 0
@@ -32,39 +35,77 @@ def playfair(plaintext: str, key: str):
 
         # filler necessary
         if c1 == c2:
-            digramText += c1 + filler
+            ciphertext += c1 + filler
             c1, c2 = c2, ''
             i += 1
         else:
-            digramText += c1 + c2
+            ciphertext += c1 + c2
             c1, c2 = '', ''
             i += 2
 
     if i == len(plaintext) - 1:
-        digramText += plaintext[-1] + filler
+        ciphertext += plaintext[-1] + filler
 
     # keyChar : (x, y)
-    positions = { c: (i % 5, i // 5 if i else 0) for i, c in enumerate(keyWord) }
+    positions = { c: (i % 5, i // 5) for i, c in enumerate(key) }
     rowSubstIndex = lambda loc: ((loc[0]+1) % 5) + loc[1]*5
     colSubstIndex = lambda loc: loc[0] + ((loc[1]+1) % 5)*5
     corSubstIndex = lambda locself, locother: locother[0] + locself[1]*5
 
     cipherText = ""
-    for i in range(0, len(digramText) - 1, 2):
-        loc1 = positions[digramText[i]]
-        loc2 = positions[digramText[i+1]]
+    for i in range(0, len(ciphertext) - 1, 2):
+        loc1 = positions[ciphertext[i]]
+        loc2 = positions[ciphertext[i+1]]
 
-        # same row
+        # same col (x)  --> go down
         if loc1[0] == loc2[0]:
-            cipherText += keyWord[rowSubstIndex(loc1)]
-            cipherText += keyWord[rowSubstIndex(loc2)]
-        # same col
+            cipherText += key[colSubstIndex(loc1)]
+            cipherText += key[colSubstIndex(loc2)]
+        # same row (y)  --> go right
         elif loc1[1] == loc2[1]:
-            cipherText += keyWord[colSubstIndex(loc1)]
-            cipherText += keyWord[colSubstIndex(loc2)]
+            cipherText += key[rowSubstIndex(loc1)]
+            cipherText += key[rowSubstIndex(loc2)]
+        # rectangle     --> same row corner
         else:
-            cipherText += keyWord[corSubstIndex(loc1, loc2)]
-            cipherText += keyWord[corSubstIndex(loc2, loc1)]
+            cipherText += key[corSubstIndex(loc1, loc2)]
+            cipherText += key[corSubstIndex(loc2, loc1)]
 
-    return cipherText
+    return cipherText, key
+
+
+
+def invertedPlayfair(ciphertext: str, keyWord):
+
+    """
+    Deciphers playfair encoded ciphertext using a keyword.
+    :param ciphertext: To decode text. Must be of even length
+    :param keyWord: To use keyword. Must be of length 25. May contain any combination of unique characters.
+    Must be of type str or List[str].
+    :return: The decoded text in string form.
+    """
+
+    # keyChar : (x, y)      with x in {0, 1, 2, 3, 4} and y in {0, 5, 10, 15, 20}
+    positions = { c: (i % 5, (i // 5)*5) for i, c in enumerate(keyWord) }
+
+    plaintext = [''] * len(ciphertext)
+    for i in range(0, len(ciphertext) - 1, 2):
+        loc1 = positions[ciphertext[i]]
+        loc2 = positions[ciphertext[i+1]]
+
+        # same col (x)  --> go up
+        if loc1[0] == loc2[0]:
+            plaintext[i]   = keyWord[loc1[0] + ((loc1[1]-5) % 25)]
+            plaintext[i+1] = keyWord[loc2[0] + ((loc2[1]-5) % 25)]
+        # same row (y)  --> go left
+        elif loc1[1] == loc2[1]:
+            plaintext[i]   = keyWord[((loc1[0]-1) % 5) + loc1[1]]
+            plaintext[i+1] = keyWord[((loc2[0]-1) % 5) + loc2[1]]
+        # rectangle     --> same row corner
+        else:
+            plaintext[i]   = keyWord[loc2[0] + loc1[1]]
+            plaintext[i+1] = keyWord[loc1[0] + loc2[1]]
+
+    return ''.join(plaintext)
+
+
 

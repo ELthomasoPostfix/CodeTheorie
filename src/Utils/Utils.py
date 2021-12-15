@@ -1,7 +1,10 @@
 import copy
 import queue
+import random
+from io import TextIOWrapper
 from math import ceil, floor, factorial, log
 import unicodedata
+from typing import List
 
 from unidecode import unidecode
 
@@ -113,4 +116,65 @@ def diffChars(a: chr, b: chr):
     return c.lower() if lower else c.upper()
 
 
+
+def writePairList(pList: List, of, sort=False, reverse=False):
+
+    opened = False
+    if isinstance(of, str):
+        opened = True
+        of = open(of, 'w')
+
+    if not isinstance(of, TextIOWrapper):
+        raise ValueError("The of parameter of writePairList accepts a string or a TextIOWrapper type")
+
+    if sort:
+        pList.sort(key=lambda p: p[1], reverse=reverse)
+
+    for item in pList:
+        of.write(str(item[0]) + " " + str(item[1]) + ("\n" if item != pList[-1] else ""))
+
+    if opened:
+        of.close()
+
+
+
+def exchange2letters(lst: List[str]):
+    i = random.randint(0, 24)
+    j = random.randint(0, 24)
+
+
+    temp = lst[i]
+    lst[i] = lst[j]
+    lst[j] = temp
+
+    
+def swap2rows(lst: List[str]):
+        i = random.randint(0, 4) * 5
+        j = random.randint(0, 4) * 5
+
+        for k in range(5):
+            temp = lst[i + k]
+            lst[i + k] = lst[j + k]
+            lst[j + k] = temp
+
+
+def swap2cols(lst: List[str]):
+    i = random.randint(0, 4)
+    j = random.randint(0, 4)
+
+    for k in range(5):
+        k *= 5
+        temp = lst[k + i]
+        lst[k + i] = lst[k + j]
+        lst[k + j] = temp
+
+
+def copyList(lst: List[str], toCopy: List[str], reverse=False):
+    if reverse:
+        endIndex = len(lst) - 1
+        for i in range(len(lst)):
+            lst[i] = toCopy[endIndex - i]
+    else:
+        for i in range(len(lst)):
+            lst[i] = toCopy[i]
 

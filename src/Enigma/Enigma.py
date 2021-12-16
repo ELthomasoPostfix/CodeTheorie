@@ -74,7 +74,7 @@ class Enigma:
     def convert(self, text: str, rotorsMove: bool = True):
 
         res: str = ""
-        char: str = self.plug(text[0])
+        char: str = self.plug(text[0], dir=MessageDirection.TO)
 
         for i in range(0, len(text)):
 
@@ -96,7 +96,7 @@ class Enigma:
             char = text[min(i+1, len(text)-1)]
 
         # plugboard back
-        return self.plug(res)
+        return self.plug(res, dir=MessageDirection.BACK)
 
 
     def cycle(self):
@@ -143,7 +143,6 @@ class Enigma:
         for i in range(3):
             self.rotors = [Rotor(rm[0], rm[1]) for rm in rotorMappings]
 
-    def plug(self, char: str):
-        # state to state + 1
-        return char
+    def plug(self, char: str, dir: int = MessageDirection.TO):
+        return self.plugBoard.get(dir, char)
 

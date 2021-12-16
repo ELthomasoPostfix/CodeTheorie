@@ -6,6 +6,7 @@
      cipher text, then the plaintext will never contain an a at that location.
 """
 import copy
+import time
 from itertools import permutations
 from math import factorial
 
@@ -18,6 +19,9 @@ from src.Utils.Utils import sumChars
 
 
 def enigmaDecryption(ciphertext: str):
+    # !! IMPORTANT !! Assuming that all start states are A is ok, because we will cycle using the turing
+    #   bomb to find k. The text representation/enigma state that k represents is the start state of
+    #   the enigma machine for the given message
     rotorMappings = [
         ['A', "AJDKSIRUXBLHWTMCQGZNPYFVOE"],
         ['A', "EKMFLGDQVZNTOWYHXUSPAIBRCJ"],
@@ -31,7 +35,7 @@ def enigmaDecryption(ciphertext: str):
 
     reflectorMapping = "YRUHQSLDPXNGOKMIEBFZCWVJAT"
     crib = "DEOPGAVEVOORENIGMA"
-    cribGraph = {(ciphertext[i], crib[i]): i+1 for i in range(len(crib))}
+    cribGraph = {(ciphertext[i], crib[i]): i+1 for i in range(len(crib))}       # TODO  don't assume crib is at the very start?
 
     la = latinAlphabet(True)
     variableGraph: PotentialGraph = PotentialGraph()
@@ -40,17 +44,16 @@ def enigmaDecryption(ciphertext: str):
     # Cycling the potential graph will cycle all row connections (cycle k)
     for vertexPair in cribGraph.keys():
         cribIndex = cribGraph[vertexPair]
-        rotorMapping = copy.deepcopy(selectedRotors)
 
-        # update start position of rotors to reflect the eps_k+i rotor
+        # Update start position of rotors to reflect the eps_k+i enigma
         # state that this row connection encodes/requires
-        # TODO  don't add i to EVERY rotor start state, add it to the overall start state AAA
-        rotor = KeyB26(3, cribIndex)
-        for i in range(3):
-            rotorMapping[i][0] = sumChars(rotorMapping[i][0], la[cribIndex])
+        # !! IMPORTANT !!  don't add i to EVERY rotor start state, add it to the overall start state, e.g. 'AAA' + i.
+        #       Then adjust the connector enigma state to the new state.
+        connector = Enigma(la, selectedRotors, reflectorMapping)
+        connector.incrementRotorsState(cribIndex)
 
-        # cipherRow, cribRow, eps_k+i
-        variableGraph.addRowConnection(vertexPair[0], vertexPair[1], Enigma(la, rotorMapping, reflectorMapping))
+        # cipherRow, cribRow, eps_k+i       (here 'AAA' + i == 1 + i)
+        variableGraph.addRowConnection(vertexPair[0], vertexPair[1], connector)
 
 
 
@@ -69,18 +72,33 @@ def enigmaDecryption(ciphertext: str):
     rotorKey = KeyN10(5, 0)
     overflow = False
 
-    # Try all rotor combinations
-    while not overflow:
-        rotorCombination = rotorKey.keyList()[:3]
-        selectedRotors = [rotorMappings[i] for i in copy.deepcopy(rotorCombination)]
+    t = time.time()
+    of = open("output/Enigma/enigma.txt", 'w')
 
-        # tune row connectors
+    batchCtr = 0
+    maxBatch = 20
+
+    # Try all rotor combinations (find 1/3 enigma settings: the rotor combination)
+    while not overflow:
+        # Choose rotor combination
+        rotorCombination = rotorKey.keyList()[:3]
+        selectedRotors = [rotorMappings[i] for i in rotorCombination]
+
+        # Tune row connectors
         variableGraph.swapOutRotors(selectedRotors)
 
+        # Loop over all possible rotor states
+        # (find 2/3 enigma settings: the rotors state)
         for k in range(0, pow(26, 3)):
 
-            if variableGraph.isGoodGraph(True, False):
-                print(f"k : {k},  rotorComb = {rotorCombination}")
+            # Charge the variable graph
+            variableGraph.chargeNode(v[0], v[1])
+
+            #print(variableGraph.toChargeString())
+
+            if variableGraph.isPermutationMatrix(True):      # (find 3/3 enigma settings: the plug combination)
+                of.write(f"{k} {rotorCombination}\n")
+                #print(f"k (enigma start state/KeyB26 seed) : {k},\n  rotorComb = {rotorCombination}")
 
             # clean up
             variableGraph.resetCharge()
@@ -88,7 +106,8 @@ def enigmaDecryption(ciphertext: str):
 
         overflow = rotorKey.incr() or rotorKey.incr()
 
-
+    of.close()
+    print(time.time() - t)
 
     # pg.chargeNode("B", "C")
     # print(pg.toChargeString())

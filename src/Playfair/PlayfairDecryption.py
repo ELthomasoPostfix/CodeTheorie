@@ -13,56 +13,6 @@ from src.Utils.Utils import swap2rows, copyList, swap2cols, exchange2letters, \
 from src.Utils.TextManipulation import latinAlphabet
 
 
-def generateFiles(cipherText: str):
-    countFreq = "CF"
-    percentFreq = "PF"
-
-    storedMonoPath = "input/ngram data/practicalcryptography.com/english_monograms.txt"
-    measuredMonoPath: str = "output/Playfair/playfairmonogramCounts.txt"
-    combinedMonoPath = "output/Playfair/cmonogramCounts.txt"
-    generateMonoFiles(cipherText, countFreq, storedMonoPath, measuredMonoPath, combinedMonoPath)
-
-    storedBiPath = "input/ngram data/practicalcryptography.com/english_bigrams.txt"
-    measuredBiPath: str = "output/Playfair/playfairbigramCounts.txt"
-    combinedBiPath = "output/Playfair/cbigramCounts.txt"
-    generateBiFiles(cipherText, countFreq, storedBiPath, measuredBiPath, combinedBiPath)
-
-
-
-def decipherTest1(cipherText: str):
-    pTF = PlayfairManualTextFrame(cipherText)
-
-    # Load digram statistics
-    englishBigrams = LatinNGrams("input/ngram data/practicalcryptography.com/english_bigrams.txt",
-                                 "CF", toLogFreq=False)
-    enBigrams = sorted(englishBigrams.getFrequenciesList(), key=lambda p: p[1], reverse=True)
-    playfairBigrams = LatinNGrams("output/Playfair/playfairbigramCounts.txt", "CF", toLogFreq=False)
-    pfBigrams = sorted(playfairBigrams.getFrequenciesList(), key=lambda p: p[1], reverse=True)
-
-    # try most probable mapping pairs
-    for i in range(50):
-        enBigram = enBigrams[i][0]
-        if enBigram[0] != enBigram[1]:
-            pTF.defineMapping(pfBigrams[i][0], enBigrams[i][0])
-
-
-    pTF.decipher()
-
-    print(pTF.text)
-    print(pTF.getBigramRepresentation())
-
-    print(pTF.getDecipheredBigramRepresentation())
-    print(pTF.toDecipheredBigramSubstring("FINA", 0))
-    print(pTF.decipheredText)
-
-    surroundings = pTF.getSurroundings('THE', 10)
-
-    for s in surroundings:
-        print(s)
-
-    print()
-    #print(pTF.getMappingRepresentation())
-
 
 
 
@@ -218,8 +168,61 @@ def playfairDecryption(cipherText: str):
 
 
 
+
+
+def generateFiles(cipherText: str):
+    countFreq = "CF"
+    percentFreq = "PF"
+
+    storedMonoPath = "input/ngram data/practicalcryptography.com/english_monograms.txt"
+    measuredMonoPath: str = "output/Playfair/playfairmonogramCounts.txt"
+    combinedMonoPath = "output/Playfair/cmonogramCounts.txt"
+    generateMonoFiles(cipherText, countFreq, storedMonoPath, measuredMonoPath, combinedMonoPath)
+
+    storedBiPath = "input/ngram data/practicalcryptography.com/english_bigrams.txt"
+    measuredBiPath: str = "output/Playfair/playfairbigramCounts.txt"
+    combinedBiPath = "output/Playfair/cbigramCounts.txt"
+    generateBiFiles(cipherText, countFreq, storedBiPath, measuredBiPath, combinedBiPath)
+
+
+
+def decipherTest1(cipherText: str):
+    pTF = PlayfairManualTextFrame(cipherText)
+
+    # Load digram statistics
+    englishBigrams = LatinNGrams("input/ngram data/practicalcryptography.com/english_bigrams.txt",
+                                 "CF", toLogFreq=False)
+    enBigrams = sorted(englishBigrams.getFrequenciesList(), key=lambda p: p[1], reverse=True)
+    playfairBigrams = LatinNGrams("output/Playfair/playfairbigramCounts.txt", "CF", toLogFreq=False)
+    pfBigrams = sorted(playfairBigrams.getFrequenciesList(), key=lambda p: p[1], reverse=True)
+
+    # try most probable mapping pairs
+    for i in range(50):
+        enBigram = enBigrams[i][0]
+        if enBigram[0] != enBigram[1]:
+            pTF.defineMapping(pfBigrams[i][0], enBigrams[i][0])
+
+
+    pTF.decipher()
+
+    print(pTF.text)
+    print(pTF.getBigramRepresentation())
+
+    print(pTF.getDecipheredBigramRepresentation())
+    print(pTF.toDecipheredBigramSubstring("FINA", 0))
+    print(pTF.decipheredText)
+
+    surroundings = pTF.getSurroundings('THE', 10)
+
+    for s in surroundings:
+        print(s)
+
+    print()
+    #print(pTF.getMappingRepresentation())
+
+
 # TODO  delete ???
-def rubbish(cipherText: str):
+def decipherTest2(cipherText: str):
     #decipherTest1(cipherText)
     #return
 

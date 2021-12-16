@@ -26,7 +26,8 @@ def toSeed(key: str):
 
 class KeyB26:
     def __init__(self, keyLen: int, seed: int, upper: bool = True):
-        keyLen = keyLen if keyLen > 0 else 1
+        if keyLen < 1:
+            raise ValueError(f"KeyB26 keyLen < 1: {keyLen}")
 
         self.isUpper = upper
         self.__key = self.__generateKey(seed, keyLen)

@@ -55,6 +55,7 @@ class PotentialGraph:
 
     def cycle(self):
         for row1, row2, connector in self.rowConnections:
+            connector: Enigma
             connector.cycle()
 
     def addRowConnection(self, row1: str, row2: str, connector: Enigma):
@@ -87,11 +88,22 @@ class PotentialGraph:
             node.discharge()
 
     def swapOutRotors(self, rotorMappings: List):
-        rotorMappings = copy.deepcopy(rotorMappings)
-        la = latinAlphabet(True)
-        for decrCribIndex, row1, row2, connector in enumerate(self.rowConnections):
-            rotorMappings[decrCribIndex][0] = sumChars(rotorMappings[decrCribIndex], la[decrCribIndex+1])
+        """
+        We assume that the index of the enigma machine in the self.rowConnections
+        list reflects its crib graph weight. We also assume that the current state of
+        the enigma machine is reflected in the start state of the rotors.
+        :param rotorMappings: The list of chosen rotor start state - rotor mapping tuple.
+        """
+        for cribIndex, connection in enumerate(self.rowConnections):
+            row1, row2, connector = connection
+            cribWeight = cribIndex + 1
+            connector: Enigma
+
+            # Set the connector to its base enigma state given the new rotors
             connector.swapOutRotors(rotorMappings)
+            # Set the connector to its eps_k+i state, where i is cribWeight
+            connector.incrementRotorsState(cribWeight)
+
 
     def resetRotors(self):
         for row1, row2, connector in self.rowConnections:
@@ -150,13 +162,13 @@ class PotentialGraph:
     def countRowCharge(self, row: str):
         chargeCount = 0
         for col in self.__alph:
-            chargeCount += self.getNode(row, col)
+            chargeCount += self.getNode(row, col).isCharged()
         return chargeCount
 
     def countColCharge(self, col: str):
         chargeCount = 0
         for row in self.__alph:
-            chargeCount += self.getNode(row, col)
+            chargeCount += self.getNode(row, col).isCharged()
         return chargeCount
 
     def isPermutationCol(self, col: int, strict: bool):

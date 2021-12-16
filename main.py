@@ -1,17 +1,6 @@
-import random
-from itertools import permutations
-from math import factorial
-
-from src.Enigma.Enigma import Enigma, Rotor
 from src.Enigma.EnigmaDecryption import enigmaDecryption
-from src.Enigma.Mapper import MessageDirection, Mapper
-from src.Playfair.Playfair import playfair
 from src.Playfair.PlayfairDecryption import playfairDecryption
-from src.Utils.Keys.KeyN10 import KeyN10
-from src.Utils.Statistics.statistics import ic
-from src.Utils.TextManipulation import toLatin, latinAlphabet
-from src.Utils.Utils import columnTransposition, \
-    invertedColumnTransposition
+from src.Utils.TextManipulation import toLatin
 from src.Vigenere.VigenerePlusDecryption import vigenerePlusDecryption
 from src.AFDGVX.testADFGVX import adfgvxDecryption
 
@@ -21,7 +10,7 @@ from src.AFDGVX.testADFGVX import adfgvxDecryption
 
 
 
-def realVig(testText: str = None, ctTextLenLimiter: int = -1):
+def vigenerePlus(testText: str = None, ctTextLenLimiter: int = -1):
     vgPlusCipherText = ""
     if testText is None or testText == "":
         file = open("input/Vigenere input.txt")
@@ -32,7 +21,7 @@ def realVig(testText: str = None, ctTextLenLimiter: int = -1):
     vigenerePlusDecryption(vgPlusCipherText, ctTextLenLimiter)
 
 
-def realPlayfair(testText: str = None):
+def playfair(testText: str = None):
     playfairCipherText = ""
     if testText is None or testText == "":
         file = open("input/Playfair input.txt")
@@ -43,7 +32,7 @@ def realPlayfair(testText: str = None):
     playfairDecryption(playfairCipherText)
 
 
-def realEnigma(testText: str = None):
+def enigma(testText: str = None):
     enigmaCipherText = ""
     if testText is None or testText == "":
         file = open("input/Enigma input.txt")
@@ -55,20 +44,21 @@ def realEnigma(testText: str = None):
 
 
 
-def realADFGVX():
+def ADFGVX():
     adfgvxDecryption("input/ADFGVX.txt")
 
 
 if __name__ == '__main__':
 
-    # no arg or None means using file text
-    #realPlayfair(None)
+    # No arg or None means using file text
 
-    #realVig(ctTextLenLimiter=300)
+    # vigenerePlus(ctTextLenLimiter=300)
 
-    # realEnigma(None)
+    # playfair(None)
 
-    # realADFGVX()
+    # enigma(None)
+
+    # ADFGVX()
 
     print("end main")
 

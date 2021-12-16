@@ -1,49 +1,72 @@
-import copy
-import time
+import random
+from itertools import permutations
+from math import factorial
 
-from unidecode import unidecode
-
+from src.Enigma.Enigma import Enigma, Rotor
+from src.Enigma.EnigmaDecryption import enigmaDecryption
+from src.Enigma.Mapper import MessageDirection, Mapper
 from src.Playfair.Playfair import playfair
-from src.Utils import Frequencies
+from src.Playfair.PlayfairDecryption import playfairDecryption
 from src.Utils.Keys.KeyN10 import KeyN10
-from src.Utils.LatinNGrams import LatinNGrams
-from src.Utils.Statistics.statistics import *
-from src.Vigenere.Vigenere import vigenere, invertedVigenere
-from src.Vigenere.VigenerePlus import vigenerePlus
-
-from src.Utils.FullEncryption import vigenerePlusEncryption
-from src.Utils.Utils import invertedColumnTransposition, latinAlphabet, diffChars, isChrLatin, columnTransposition
-from src.Utils.Keys.KeyB26 import KeyB26, toSeed
-from src.Vigenere.VigenerePlus import VigenerePlusTextFrame
+from src.Utils.Statistics.statistics import ic
+from src.Utils.TextManipulation import toLatin, latinAlphabet
+from src.Utils.Utils import columnTransposition, \
+    invertedColumnTransposition
+from src.Vigenere.VigenerePlusDecryption import vigenerePlusDecryption
 
 
 
-def icNederlands():
-    alphabet = [chr(asciiVal) for asciiVal in range(65, 91)]
-    texts = ["input/texts/antons tweestrijd.txt", "input/texts/Columbus de ontdekker van Amerika.txt",
-             "input/texts/de vlegeljaren van Pietje Bell.txt", "input/texts/aan gene zijde van den evenaar.txt"]
-
-    return ic(texts, alphabet)
 
 
-def vig():
-    plaintext = "BARRYISEENLIJPEKERELMAARHIJISWELKNAPTOCHVINDIKDATHARRYAANGENAMERISOMMEEOMTEGAANANDERZIJDSKANBARRYRAPHOOFDREKENENWATZEKERGRENZELOZETOEPASSINGSWAARDEHEEFTINDEWERELDDERVOLWASSENENWAARACHTIGDEKEUZEISZEERMOEILIJKGEMAAKTDEAAPEETEENRAAPOPEENSCHAAPMAAREENKNAAPJAAGTHEMWEG"
-    cipherText = ""
-    vkey = "BLIJTEN"
-    ctkey = "POMMEDT"
-
-    cipherText = vigenerePlusEncryption(plaintext, vKey=vkey, ctKey=ctkey)
-
-    icVal = kasiski(cipherText, [3], 10)
-
-    print(icVal)
 
 
+
+def realVig(testText: str = None, ctTextLenLimiter: int = -1):
+    vgPlusCipherText = ""
+    if testText is None or testText == "":
+        file = open("input/Vigenere input.txt")
+        vgPlusCipherText = toLatin(file.read())
+    else:
+        vgPlusCipherText = testText
+
+    vigenerePlusDecryption(vgPlusCipherText, ctTextLenLimiter)
+
+
+def realPlayfair(testText: str = None):
+    playfairCipherText = ""
+    if testText is None or testText == "":
+        file = open("input/Playfair input.txt")
+        playfairCipherText = toLatin(file.read())
+    else:
+        playfairCipherText = testText
+
+    playfairDecryption(playfairCipherText)
+
+
+def realEnigma(testText: str = None):
+    enigmaCipherText = ""
+    if testText is None or testText == "":
+        file = open("input/Enigma input.txt")
+        enigmaCipherText = toLatin(file.read())
+    else:
+        enigmaCipherText = testText
+
+    enigmaDecryption(enigmaCipherText)
 
 
 
 if __name__ == '__main__':
-    pass
+
+    # no arg or None means using file text
+    #realPlayfair(None)
+
+    #realVig(ctTextLenLimiter=300)
+
+    realEnigma(None)
+
+
+
+    print("end main")
 
 
 

@@ -115,15 +115,15 @@ def avgICs(cipherText: str):
                 multiples[keyLen] = sumAvgs / ctr
 
             # TODO  output
-            # output += "period\t\t\tavg col ic\n"
-            # for i, avg in enumerate(averages):
-            #     output += str(i+1) + "\t"*2 + str(avg) + "\t\n"
-            # output += "\n"
-            #
-            # output += "multiple\t\tavg ic\n"
-            # for key in sorted(multiples.keys()):
-            #     output += str(key) + "\t" * 2 + str(multiples[key]) + "\n"
-            # output += "\n\n-------------------------------------------\n\n"
+            output += "period\t\t\tavg col ic\n"
+            for i, avg in enumerate(averages):
+                output += str(i+1) + "\t"*2 + str(avg) + "\t\n"
+            output += "\n"
+
+            output += "multiple\t\tavg ic\n"
+            for key in sorted(multiples.keys()):
+                output += str(key) + "\t" * 2 + str(multiples[key]) + "\n"
+            output += "\n\n-------------------------------------------\n\n"
 
             for i, avg in enumerate(averages):
                 if avg > maxColAvg:

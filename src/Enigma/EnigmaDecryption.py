@@ -5,17 +5,12 @@
      will never light up. This means that if you find an A at position i of the
      cipher text, then the plaintext will never contain an a at that location.
 """
-import copy
 import time
-from itertools import permutations
-from math import factorial
 
 from src.Enigma.Enigma import Enigma
 from src.Enigma.PotentialGraph import PotentialGraph
-from src.Utils.Keys.KeyB26 import KeyB26
 from src.Utils.Keys.KeyN10 import KeyN10
 from src.Utils.TextManipulation import latinAlphabet
-from src.Utils.Utils import sumChars
 
 
 def enigmaDecryption(ciphertext: str):

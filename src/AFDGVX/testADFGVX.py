@@ -1,12 +1,11 @@
-import readMorse
+import ADFGVX
 
 
-def test():
-    input = "../../input/ADFGVX.txt"
+def adfgvxDecryption(input):
+    output = ADFGVX.adfgvx(input)
+    ADFGVX.writeOptionsToFile(output)
 
-    output = readMorse.read_morse(input)
-    print(output)
 
 
 if __name__ == '__main__':
-    test()
+    adfgvxDecryption()

@@ -63,8 +63,8 @@ def thomasADFGVX ():
     of.close()
 
 
-def adfgvx ():
-    file = "../../input/ADFGVX.txt"
+def adfgvx (name):
+    file = name
     text = read_morse(file)
 
     combs = []
@@ -75,20 +75,60 @@ def adfgvx ():
     # TODO : add list of lists, the outer list contains lists for every length we discuss
     # TODO : every inner list contains the key and its frequencies, we go check if one corresponds to a language later
     # For every key length
-    for ctKeyLen in range(1, 11):            # we check every key of length 1 to 10
 
+    viableOptions = []                        # make a list of all
+
+    for ctKeyLen in range(1, 11):            # we check every key of length 1 to 10
+        print(ctKeyLen)
 
         # setup for while loop
         ctKey = KeyN10(ctKeyLen, 0)
         overflow = False
 
-
+        lengthxOptions = []
 
         # loop over all possible ct keys of length ctKeyLen
         while not overflow:
             ADFGVXtext = invertedColumnTransposition(text, ctKey.keyList())
 
             # body
+            bigramFreqs = {b: 0 for b in combs}                 # all combinations
+            for i in range(0, len(ADFGVXtext) - 1, 2):
+                bigram = ADFGVXtext[i] + ADFGVXtext[i + 1]
+                bigramFreqs[bigram] += 1
+
+            # if some bigrams do not show up it can be because they are numbers which won't appear, if 3 or more do not
+            # sho, we add it to the viable options for this length
+            amountNotFound = 0
+            thoseNotFound = []
+            for gram in bigramFreqs:
+                if gram[1] == 0:
+                    amountNotFound += 1
+                    thoseNotFound.append(gram[0])
+
+            if amountNotFound >= 3:
+                lengthxOptions.append((ctKey.key(), bigramFreqs))
 
             overflow = ctKey.incr()         # last key tested?
 
+        viableOptions.append((ctKeyLen, lengthxOptions))
+
+    return viableOptions
+
+def writeOptionsToFile(options):
+    file = open("outputOption.txt", "w")
+    text = read_morse("../../input/ADFGVX.txt")
+    outputToFile = ""
+    for length in options:
+        print("Key length: " + str(length[0]))
+        for key in length[1]:
+            print("\tKey: " + str(key[0]))
+            outputToFile += "Key : " + str(key[0]) + " frequencies\n"
+
+            for bi in key[1]:
+                outputToFile += str(bi[0]) + "\t"*3 + str(bi[1] / len(text) / 2.0) + "\n"
+
+            outputToFile += "----------------------------------------\n"
+
+    file.write(outputToFile)
+    file.close()

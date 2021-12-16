@@ -13,7 +13,7 @@ from src.Utils.TextManipulation import toLatin, latinAlphabet
 from src.Utils.Utils import columnTransposition, \
     invertedColumnTransposition
 from src.Vigenere.VigenerePlusDecryption import vigenerePlusDecryption
-
+from src.AFDGVX.testADFGVX import adfgvxDecryption
 
 
 
@@ -55,6 +55,10 @@ def realEnigma(testText: str = None):
 
 
 
+def realADFGVX():
+    adfgvxDecryption("input/ADFGVX.txt")
+
+
 if __name__ == '__main__':
 
     # no arg or None means using file text
@@ -62,9 +66,9 @@ if __name__ == '__main__':
 
     #realVig(ctTextLenLimiter=300)
 
-    realEnigma(None)
+    # realEnigma(None)
 
-
+    # realADFGVX()
 
     print("end main")
 

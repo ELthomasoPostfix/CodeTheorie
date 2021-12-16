@@ -66,7 +66,7 @@ class Enigma:
                 raise ValueError("Incorrect rotor start state for Enigma construction")
 
         # fast to slow rotor ordering
-        self.rotors: List[Rotor] = [Rotor(rm[0], rm[1]) for rm in rotorMappings]
+        self.rotors: List[Rotor] = [Rotor(rm[0], rm[1]) for rm in rotorMappings[:3]]
         self.reflector: Mapper = Mapper(la, reflectorMapping)
         self.keyBoard: List[str] = la
         self.plugBoard: Mapper = Mapper(la, plugMapping)

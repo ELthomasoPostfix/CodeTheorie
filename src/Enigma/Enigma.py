@@ -1,0 +1,124 @@
+from typing import List
+from src.Enigma.Mapper import Mapper, MessageDirection
+from src.Utils.Keys.KeyB26 import KeyB26
+from src.Utils.TextManipulation import latinAlphabet
+from src.Utils.Utils import sumChars, diffChars
+
+
+class Rotor:
+    def __init__(self, startState: str, mapping: str):
+        la = latinAlphabet(True)
+        if len(mapping) != 26 or set(la) != set(mapping):
+            raise ValueError("Rotor must have a mapping from and to the latin alphabet")
+
+        if len(startState) != 1:
+            raise ValueError("Rotor start state must be of length 1")
+
+        self.__startState = startState
+        self.state = None
+        self.resetState()
+        self.__mapping: Mapper = Mapper(la, mapping)
+
+    def map(self, direction: int, value: str):
+        return diffChars(self.__mapping.get(direction, sumChars(value, self.state.key())), self.state.key())
+
+    def incr(self) -> bool:
+        return self.state.incr()
+
+    def resetState(self):
+        self.state = KeyB26(1, ord(self.__startState.upper()) % 0x41)
+
+
+
+class Enigma:
+    def __init__(self, plugMapping, rotorMappings: List, reflectorMapping):
+
+        """
+        Models an enigma machine.
+        :param plugMapping: The ordered iterable that the values 'ABC...XYZ'
+            are mapped to. It pertains to the plug board of the enugma machine.
+            We assume
+                A -> reflMap[0]
+                B -> reflMap[1]
+                ...
+                Z -> reflMap[25]
+        :param rotorMappings: A list of pairs of a character and a ordered iterable to which the values
+            'ABC...XYZ' are mapped to. The character is the start state of the given rotor. We assume
+                A -> rotMap[0][0]
+                B -> rotMap[0][1]
+                ...
+                Z -> rotMap[0][25]
+                A -> rotMap[1][0]
+                ...
+                Z -> rotMap[25][25]
+        :param reflectorMapping: The ordered iterable that the values 'ABC...XYZ'
+            are mapped to. It pertains to the reflector of te enigma machine. We assume
+                A -> reflMap[0]
+                B -> reflMap[1]
+                ...
+                Z -> reflMap[25]
+        """
+        la = latinAlphabet(True)
+
+        for mapping in rotorMappings:
+            if mapping[0] not in la:
+                raise ValueError("Incorrect rotor start state for Enigma construction")
+
+        # fast to slow rotor ordering
+        self.rotors: List[Rotor] = [Rotor(rm[0], rm[1]) for rm in rotorMappings]
+        self.reflector: Mapper = Mapper(la, reflectorMapping)
+        self.keyBoard: List[str] = la
+        self.plugBoard: Mapper = Mapper(la, plugMapping)
+
+    def convert(self, text: str, rotorsMove: bool = True):
+
+        res: str = ""
+        char: str = self.plug(text[0])
+
+        for i in range(0, len(text)):
+
+            for rot in self.rotors:
+                char = rot.map(MessageDirection.TO, char)
+
+            # reflector
+            char = self.reflector.get(MessageDirection.TO, char)
+
+            # BACK
+            for rot in reversed(self.rotors):
+                char = rot.map(MessageDirection.BACK, char)
+
+            # alter rotors
+            if rotorsMove:
+                self.cycle()
+
+            res += char
+            char = text[min(i+1, len(text)-1)]
+
+        # plugboard back
+        return self.plug(res)
+
+    def cycle(self):
+        for rot in self.rotors:
+            if not rot.incr():
+                return False        # no overflow, following rotors unchanged
+        return True     # last rotor overflowed
+
+    def rotorsState(self) -> str:
+        """
+        Get the state of the rotors. Ordered fast/middle/slow
+        :return: String  representation of rotor states.
+        """
+        return ''.join([r.state.key() for r in self.rotors])
+
+    def resetRotors(self):
+        for rotor in self.rotors:
+            rotor.resetState()
+
+    def swapOutRotors(self, rotorMappings: List):
+        for i in range(3):
+            self.rotors = [Rotor(rm[0], rm[1]) for rm in rotorMappings]
+
+    def plug(self, char: str):
+        # state to state + 1
+        return char
+

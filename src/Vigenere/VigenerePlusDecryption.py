@@ -9,6 +9,7 @@ m = message
 
 """
 from itertools import permutations
+from math import factorial
 
 from src.Utils.Keys.KeyN10 import KeyN10
 from src.Utils.TextManipulation import latinAlphabet
@@ -16,6 +17,8 @@ from src.Utils.Utils import *
 from src.Utils.Statistics.statistics import *
 from src.Vigenere.TextFrames.VigenerePlusTextFrame import VigenerePlusTextFrame
 from src.Vigenere.TextFrames.VigenerePlusTextFrame2 import VigenerePlusTextFrame2
+
+
 
 
 def statComp(cipherText: str):
@@ -211,6 +214,7 @@ def getBestKey(cipherText: str, ctKey: KeyN10, vgKeyLen: int,
     return bestscore, bestkey, ctKey.seed()
 
 
+
 def writeResults(results, postfixCounter: int):
     results.sort(key=lambda k: k[0], reverse=True)
     fileName = f"2vigenerePlus_{postfixCounter}.txt"
@@ -239,11 +243,11 @@ def vigenerePlusDecryption(cipherText: str, ctTextLimit: int = -1):
     statComp(cipherText)
 
     autocorrelation spikes at keyLen 7 (190 matches) and kasiski contains many multiples of 7 as divisors.
-    Kasiski spikes at keyLen 2, with may multiples of 2 still having decent divisor counts.
+    Kasiski spikes at keyLen 2, with many multiples of 2 still having decent divisor counts.
     ==> keyLen == 7 or keyLen in [2, 4, 8] ??? 
     """
 
-    avgICs(cipherText)
+    #avgICs(cipherText)
 
 
     """

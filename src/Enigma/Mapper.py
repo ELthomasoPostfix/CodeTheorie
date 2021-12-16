@@ -2,20 +2,20 @@ from enum import Enum
 
 
 class MessageDirection(Enum):
-    IN: int = 0
-    OUT: int = 1
+    TO: int = 0
+    BACK: int = 1
 
 
 class Mapper:
-    def __init__(self):
-        self.__in = {}
-        self.__out = {}
+    def __init__(self, fromValues, toValues):
+        self.__rightToLeft = {fromValues[i]: toValues[i] for i in range(len(fromValues))}
+        self.__leftToRight = {i[1]: i[0] for i in self.__rightToLeft.items()}
 
-    def get(self, direction: int, s: str):
-        if direction == MessageDirection.IN:
-            return self.__in[s]
-        if direction == MessageDirection.OUT:
-            return self.__out[s]
+    def get(self, direction: int, value: str):
+        if direction == MessageDirection.TO:
+            return self.__rightToLeft.get(value)
+        if direction == MessageDirection.BACK:
+            return self.__leftToRight.get(value)
         return None
 
 
